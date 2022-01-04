@@ -1,6 +1,5 @@
 <?php
 $mysqli = new mysqli("10.20.0.235", "usercheer", "cheer#2021<2022", "user");
-
 // Check connection
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: " . $mysqli->connect_error;
@@ -44,7 +43,6 @@ function getChildNode($parent)
     }
 }
 getChildNode(0);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,9 +57,10 @@ getChildNode(0);
     <link rel="icon" type="image/x-icon" href="./60-thMed-logo.png">
     <style type="text/css">
         body {
-            width: 98%;
+            width: 80%;
             margin: 0 auto;
         }
+
         .li-style {
             color: darkred;
         }
@@ -74,17 +73,15 @@ getChildNode(0);
 
 <body>
     <br />
-    <b>แผนผังองค์กร</b> Search : <input type="text" id="search-input" class="search-input" />
+    <b>แผนผังองค์กร</b> Search : <input type="text" id="search-input" class="search-input" /> <input type="button" value="ค้นหา" id="bt_search">
     <div id="jstree_demo"></div>
 </body>
 <script src="./src/jquery.min.js"></script>
 <script src="./src/jstree.min.js"></script>
 <script>
     $(function() {
-
         // Create an jstree instance
         $('#jstree_demo').jstree({ // config object start
-
             "core": { // core config object
                 "mulitple": false, // disallow multiple selection  
                 "animation": 100, // 200ms is default value
@@ -93,7 +90,6 @@ getChildNode(0);
                     "variant": "medium",
                     "dots": false
                 },
-
                 "data": [
                     // The required JSON format for populating a tree
                     {
@@ -107,7 +103,6 @@ getChildNode(0);
                 ] // data core options end
 
             }, // core end
-
             // Types plugin
             "types": {
                 "default": {
@@ -117,18 +112,15 @@ getChildNode(0);
                     "icon": "glyphicon glyphicon-tasks"
                 }
             },
-
             // config object for Checkbox plugin (declared below at plugins options)
             "checkbox": {
                 "keep_selected_style": false, // default: false
                 "three_state": true, // default: true
                 "whole_node": true // default: true
             },
-
             "conditionalselect": function(node, event) {
                 return false;
             },
-
             // injecting plugins
             "plugins": [
                 "search",
@@ -152,20 +144,26 @@ getChildNode(0);
                 "show_only_matches": true
             }
         }); // config object end
-
         // Listen for events - example
         $('#jstree_demo_div').on("changed.jstree", function(e, data) {
             // changed.jstree is a event
             // console.log(data.selected);
             console.log('ds: ' + data.changed.deselected);
         });
+    });
 
+    $("#bt_search").click(function() {
+        if ($("#search-input").val()) {
+            $('#jstree_demo').jstree('search', $("#search-input").val());
+        }
     });
 
     $(document).ready(function() {
         $(".search-input").keyup(function() {
-            var searchString = $(this).val();
-            $('#jstree_demo').jstree('search', searchString);
+            if ($("#search-input").val() == '') {
+                var searchString = $(this).val();
+                $('#jstree_demo').jstree('search', searchString);
+            }
         });
     });
 </script>
