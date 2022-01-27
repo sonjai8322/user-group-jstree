@@ -1,40 +1,55 @@
 <?php
-$mysqli = new mysqli("10.20.0.235", "usercheer", "cheer#2021<2022", "user");
-// Check connection
-if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: " . $mysqli->connect_error;
-    exit();
-}
-$mysqli->set_charset("utf8");
-$result = $mysqli->query("select * from `group`");
+$curl = curl_init();
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'http://10.20.0.235/api/group/search_group',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'GET',
+  CURLOPT_POSTFIELDS =>'{
+    "all":"yes"
+}',
+  CURLOPT_HTTPHEADER => array(
+    'Content-Type: application/json'
+  ),
+));
+$response = curl_exec($curl);
+curl_close($curl);
+$result = json_decode($response);
+
 $result_tmp = array();
-while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+foreach ($result->dataList as $key=>$row) {
     $result_tmp[] = $row;
 }
+
 function findByID($parent)
 {
     global $result_tmp;
     $ans = array();
     foreach ($result_tmp as $key11 => $data11) {
-        if ($data11['parent'] == $parent) {
+        if ($data11->parent == $parent) {
             $ans[] = $data11;
             unset($result_tmp[$key11]);
         }
     }
     return $ans;
 }
+$data = "";
 function getChildNode($parent)
-{
+{ 
     global $data;
     $result = findByID($parent);
     if (count($result)) {
         $data .= '"children": [';
     }
     foreach ($result as $key11 => $row) {
-        $data .= '{"text": "' . $row['name'] . '","state": {"opened": true}';
-        if ($row['gid'] != '') {
+        $data .= '{"text": "' . $row->name . '","state": {"opened": true}';
+        if ($row->gid != '') {
             $data .= ',';
-            getChildNode($row['gid']);
+            getChildNode($row->gid);
         }
         $data .= '},';
     }
@@ -42,6 +57,7 @@ function getChildNode($parent)
         $data .= ']';
     }
 }
+
 getChildNode(0);
 ?>
 <!DOCTYPE html>
